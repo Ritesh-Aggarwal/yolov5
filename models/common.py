@@ -43,6 +43,28 @@ def autopad(k, p=None, d=1):  # kernel, padding, dilation
     return p
 
 
+def CheckRange1(_coords, r):
+    # Function which takes bounding box coordinates and polygon coordinates as r
+    #is_inside_roi = False[[312, 130], [433, 137], [457, 278], [308, 282]]
+    #vts = np.array([(312,130),(433,137),(457, 278),(308,282)])   [[179, 15], [122, 286], [283, 283], [257, 14]]
+    vts = np.array(r)
+    pgon = patches.Polygon(vts, color="blue", alpha=0.5)
+    # plot the polygon patch
+    fig, ax = plt.subplots()
+    ax.add_patch(pgon)
+    for i in _coords:
+        is_inside_roi = False
+        print("Values:::", i[0], i[1], i[2], i[3])
+        point1 = (i[2], i[3])  # upper-right point: (xmax,ymax)
+        point2 = (i[0], i[1])  # lower-left point:  (xmin,ymin)
+        # check if the 2 points are inside the polygon patch?
+        pts_inside = pgon.contains_points(ax.transData.transform([point2, point1]))
+        if (pts_inside.any()):
+            is_inside_roi = True
+            break
+    return is_inside_roi
+
+
 class Conv(nn.Module):
     # Standard convolution with args(ch_in, ch_out, kernel, stride, padding, groups, dilation, activation)
     default_act = nn.SiLU()  # default activation
